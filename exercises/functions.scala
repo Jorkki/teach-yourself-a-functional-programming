@@ -1,30 +1,33 @@
-object Functions {
+object HigherOrderFunctions {
 
-    // adds two integers together
-    def plus(x: Int, y:Int):Int = ???
-    
-    // salutes the given name, e.g. Hello, User
-    def salutation(name: String):String = ???
+    // returns a function that increments a given argument with a predefined amount
+    def plus(x:Int):(Int => Int) = (y:Int) => y + x
 
-    // counts the number of characters in a given string
-    def characters(name: String):Int = ???
+    // returns a function that subtracts a given argument with a predefined amount
+    def minus(x:Int):(Int => Int) = (y:Int) => y - x
 
-    // returns the base x to the power y, i.e. x^y
-    def pow(x: Int, y: Int) = ???
+    // calls 'action' function with the given x argument and returns the result
+    def doIt(x:Int, action: (Int => Int)):Int = action(x)
 
-    /** Salutes the user according to the time of day given in isDayTime
-      * During daytime, salutes with "Hello". During nighttime, salutes with "Good night"
+    /** combines two functions that both take integer arguments by passing the result from
+      * the first function as the argument to the second function, and returns its return value
       */
-    def dayOrNightSalutation(name:String, isDayTime: Boolean) = ???
+    def combineInt(first: (Int => Int), second: (Int => Int)):(Int => Int) = (x:Int) => second(first(x))
 
-    // return first two names in a given list
-    def firstTwo(names: List[String]) = ???
+    // combines two functions of generic types
+    def combine[A, B, C](first: (A => B), second: (B => C)):(A => C) = (x) => second(first(x))
 
-    // return the last name in a given list
-    def lastName(names: List[String]) = ???
+    /** converts a two-argument integer-taking function to a single-argument function
+      * where the argument is fixed with given 'param'
+      */
+    def curry2int(fn: (Int, Int) => Int, param: Int): (Int => Int) = (x:Int) => fn(param, x)
 
-    // combines two lists
-    def combine(names: List[String], letters: List[String]) = ???
+    /** 'curries' a two-argument generic function - i.e. translates the evaluation of a function 
+      * that takes two arguments into evaluating a sequence of functions, each with a single argument
+      */
+    def curry2[A, B, C](fn: (A, B) => C): (A => (B => C)) = (a: A) => (b: B) => fn(a, b)
+
+
 
 
 
@@ -53,37 +56,38 @@ object Functions {
 
     val tests = List[(String, Function0[Unit])](
         ("plus", () => {
-            verify(6, plus(2, 4))
-            verify(4, plus(2, 2))
+            verify(6, plus(4)(2))
+            verify(4, plus(2)(2))
         }),
-        ("salutation", () => {
-            verify("Hello, World", salutation("World"))
-            verify("Hello, Mark" , salutation("Mark"))
+        ("minus", () => {
+            verify(2, minus(4)(6))
+            verify(0, minus(2)(2))
         }),
-        ("character count", () => {
-            verify(6, characters("foobar"))
-            verify(22, characters("functional programming"))
+        ("do it!",() => {
+            verify(2, doIt(4, minus(2)))
+            verify(20, doIt(10, plus(10)))
         }),
-        ("power", () => {
-            verify(216, pow(6, 3))
-            verify(32, pow(2, 5))
+        ("combine integer functions", () => {
+            verify(20, combineInt(plus(10), minus(5))(15))
+            verify(12, combineInt(plus(6), minus(1))(7))
         }),
-        ("time-of-day-aware salutation", () => {
-            verify("Hello, Mark", dayOrNightSalutation("Mark", true))
-            verify("Good night, Mark", dayOrNightSalutation("Mark", false))
-            verify("Good night, World", dayOrNightSalutation("World", false))
+        ("combine generic functions", () => {
+            verify(8, combine(characters, plus(4))("five"))
+            verify("234", combine((x:Int) => x.toString, (s:String) => s + "34")(2))
         }),
-        ("get first two names in list", () => {
-            verify(List("Jill", "Jack"), firstTwo(participants))
+        ("curry with integers", () => {
+            verify(4, curry2int(plus, 4)(0))
+            verify(200, curry2int((x:Int, y:Int) => x + y * 2, 4)(98))
         }),
-        ("get last two names in list", () => {
-            verify("Mary", lastName(participants))
-        }),
-        ("combine two lists", () => {
-            verify(List("Jill", "Jack", "John", "George", "Mary", "a", "b", "c"), combine(participants, letters))
+        ("generic two-argument curry", () => {
+            verify(5, curry2(plus)(2)(3))
+            verify(17, curry2((x:Int, y:Int) => x + y * 5)(2)(3))
         })
     )
 
-    val participants = List("Jill", "Jack", "John", "George", "Mary")
-    val letters = List("a", "b", "c")
+    // counts the number of characters in a given string
+    def characters(name: String):Int = name.length
+
+    val plus = (x:Int, y:Int) => x + y
+
 }

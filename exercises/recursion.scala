@@ -6,14 +6,18 @@ object Recursion {
       * 5! = 5 * 4 * 3 * 2 * 1
       * 3! = 3 * 2 * 1
       */
-    def fact(num:Int) = ???
+    def fact(num:Int):Int = if(num == 1 | num == 0) 1 else num * fact(num-1) 
 
     /** computes fibonacci value for a given number
       *
       * fibonacci sequence for number x can be obtained
       * by calculating fib(x - 1) + fib(x - 2)
       */
-    def fib(num:Int) = ???
+    def fib(num:Int):Int = num match { //if(num == 0 | num == 1) num else fib(num - 1) + fib(num - 2)
+        case 0 => 0
+        case 1 => 1
+        case _ => fib(num - 1) + fib(num - 2)
+    }
 
     /** returns true if 'list' contains 'needle'
       *

@@ -12,7 +12,11 @@ object ProjectEuler {
    * By considering the terms in the Fibonacci sequence whose values do not
    * exceed four million, find the sum of the even-valued terms.
    */
-  def problem2(): Int = ???
+  def problem2():Int = {
+    lazy val fib: Stream[Int] = Stream.cons(0, Stream.cons(1, fib.zip(fib.tail).map(x => x._1 + x._2)))
+    
+    fib.filter(_ % 2 != 0).takeWhile(_ <= 4000000).sum
+  }
 
   /*
    * Largest palindrome product
@@ -23,7 +27,12 @@ object ProjectEuler {
    * Find the largest palindrome made from the product of two 3-digit numbers.
    *
    */
-  def problem4(): Int = ???
+  def problem4(): Int = {
+    def isPal(n:Int):Boolean = n.toString.reverse == n.toString
+    val pals = for (i <- (100 to 999).view; j <- (i to 999); val p = i * j if isPal(p)) yield p
+    pals.toList.max
+    
+  }
 
   /*
    * Special Pythagorean triplet
@@ -36,7 +45,16 @@ object ProjectEuler {
    * There exists exactly one Pythagorean triplet for which a + b + c = 1000.
    * Find the product abc.
    */
-  def problem9(): Int = ???
+  def problem9(): Int = {
+    def isTrip(a: Int, b: Int, c: Int) = {
+      (a*a) + (b*b) == (c*c) && a < b && b < c && a + b + c == 1000
+    }
+    val tris = for(a <- (1 to 1000).view; b <- (a to 1000); c <- (b to 1000) if(isTrip(a, b, c))) yield (a, b, c)
+    
+    val product = tris.head
+    
+    product._1 * product._2 * product._3
+  }
 
 
   /*
